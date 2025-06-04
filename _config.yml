@@ -1,6 +1,7 @@
 # Configuración para GitHub Pages
 include:
   - .well-known
+  - 404.html
 
 # Asegurar que el archivo apple-app-site-association se sirva como JSON
 defaults:
@@ -12,4 +13,8 @@ defaults:
 # Configuración básica
 title: CulturaFreak
 description: Tu agenda cultural personal
-url: "https://app.culturafreak.com" 
+url: "https://app.culturafreak.com"
+
+# Plugins para mejorar el manejo de URLs
+plugins:
+  - jekyll-redirect-from 

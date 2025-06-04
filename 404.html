@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+        // Detectar si es una ruta de evento y redirigir apropiadamente
+        (function() {
+            const path = window.location.pathname;
+            
+            // Si es una ruta de evento, manejar la redirección
+            if (path.startsWith('/evento/')) {
+                const eventoId = path.split('/evento/')[1];
+                
+                // Redirigir a la página de evento con el ID preservado
+                const search = window.location.search;
+                window.location.href = `/evento/${search ? `?eventoId=${eventoId}&${search.substring(1)}` : `?eventoId=${eventoId}`}`;
+                return;
+            }
+            
+            // Para otras rutas, redirigir al inicio
+            window.location.href = '/';
+        })();
+    </script>
+    
+    <script>
+        // Actualizar meta tags dinámicamente ANTES de que cargue la página
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const path = window.location.pathname;
+            const eventoId = path.split('/evento/')[1] || urlParams.get('eventoId') || 'demo';
+            
+            // Obtener datos de la URL
+            const titulo = urlParams.get('titulo') || `Evento ${eventoId}`;
+            const fechaStr = urlParams.get('fecha');
+            const categoria = urlParams.get('categoria') || 'CULTURA';
+            
+            // Formatear fecha
+            let fechaFormateada = 'Fecha';
+            if (fechaStr) {
+                const fecha = new Date(fechaStr + 'T00:00:00');
+                fechaFormateada = fecha.toLocaleDateString('es-ES', { 
+                    day: 'numeric', 
+                    month: 'short', 
+                    year: 'numeric' 
+                });
+            }
+            
+            // Obtener emoji para categoría
+            function getEmoji(cat) {
+                switch (cat.toUpperCase()) {
+                    case 'CINEYTV': return '🎬';
+                    case 'VIDEOJUEGOS': return '🎮';
+                    case 'DEPORTES': return '⚽';
+                    case 'TECNOLOGIA': return '💻';
+                    case 'FESTIVIDADES': return '🎉';
+                    case 'CURIOSIDADES': return '🤔';
+                    default: return '🎟️';
+                }
+            }
+            
+            const emoji = getEmoji(categoria);
+            const description = `📅 ${fechaFormateada} • ${emoji} ${categoria}`;
+            const fullTitle = `${titulo} - CULTURAFREAK`;
+            const currentUrl = `https://app.culturafreak.com/evento/${eventoId}`;
+            
+            // Crear y agregar meta tags dinámicos
+            document.write(`
+                <!-- Meta tags básicos -->
+                <title>${fullTitle}</title>
+                <meta name="description" content="${description}">
+                
+                <!-- Open Graph para Facebook/WhatsApp -->
+                <meta property="og:type" content="article">
+                <meta property="og:site_name" content="CULTURAFREAK">
+                <meta property="og:url" content="${currentUrl}">
+                <meta property="og:title" content="${titulo}">
+                <meta property="og:description" content="${description}">
+                <meta property="og:image" content="https://app.culturafreak.com/app-icon.svg">
+                <meta property="og:image:width" content="1200">
+                <meta property="og:image:height" content="1200">
+                <meta property="og:image:type" content="image/svg+xml">
+                
+                <!-- Twitter Card -->
+                <meta name="twitter:card" content="summary_large_image">
+                <meta name="twitter:title" content="${titulo}">
+                <meta name="twitter:description" content="${description}">
+                <meta name="twitter:image" content="https://app.culturafreak.com/app-icon.svg">
+            `);
+        })();
+    </script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        
+        p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background: #000;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: transform 0.2s;
+        }
+        
+        .download-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        #loading {
+            display: block;
+        }
+        
+        #app-link {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎟️</div>
+        <h1>CULTURAFREAK</h1>
+        
+        <div id="loading">
+            <p>Cargando evento...</p>
+        </div>
+        
+        <div id="app-link">
+            <p>Abre este evento en la app</p>
+            <a href="#" id="download-link" class="download-btn">
+                📱 Ver en CULTURAFREAK
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // Obtener ID del evento desde la URL o parámetros
+        const path = window.location.pathname;
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventoId = path.split('/evento/')[1] || urlParams.get('eventoId') || 'demo';
+        
+        // URLs para diferentes plataformas
+        const appStoreUrl = 'https://apps.apple.com/us/app/culturafreak/id6744939463';
+        const appCustomUrl = `culturafreak://evento/${eventoId}`;
+        
+        // Función para detectar dispositivo
+        function detectDevice() {
+            const userAgent = navigator.userAgent;
+            
+            if (/iPad|iPhone|iPod/.test(userAgent)) {
+                return 'ios';
+            } else if (/Android/.test(userAgent)) {
+                return 'android';
+            } else {
+                return 'other';
+            }
+        }
+        
+        // Función principal de redirección
+        function handleRedirect() {
+            const device = detectDevice();
+            const downloadLink = document.getElementById('download-link');
+            
+            // Mostrar interfaz
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app-link').style.display = 'block';
+            
+            if (device === 'ios') {
+                // Para iOS: intentar Universal Link y URL scheme
+                downloadLink.href = appStoreUrl;
+                downloadLink.textContent = '📱 Abrir en CULTURAFREAK';
+                
+                // Intentar abrir la app directamente
+                setTimeout(() => {
+                    // Crear iframe oculto para intentar abrir la app
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = appCustomUrl;
+                    document.body.appendChild(iframe);
+                    
+                    // Limpiar el iframe
+                    setTimeout(() => {
+                        if (document.body.contains(iframe)) {
+                            document.body.removeChild(iframe);
+                        }
+                    }, 500);
+                }, 1000);
+                
+                // Timeout para App Store si la app no se abre
+                setTimeout(() => {
+                    if (document.visibilityState === 'visible') {
+                        window.location.href = appStoreUrl;
+                    }
+                }, 4000);
+                
+            } else {
+                // Para otros dispositivos
+                downloadLink.href = appStoreUrl;
+                downloadLink.textContent = '📱 Descargar CULTURAFREAK';
+                
+                setTimeout(() => {
+                    window.location.href = appStoreUrl;
+                }, 3000);
+            }
+        }
+        
+        // Ejecutar cuando la página carga
+        document.addEventListener('DOMContentLoaded', handleRedirect);
+    </script>
+</body>
+</html> 
