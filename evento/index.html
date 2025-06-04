@@ -57,16 +57,16 @@
                 <meta property="og:url" content="${currentUrl}">
                 <meta property="og:title" content="${titulo}">
                 <meta property="og:description" content="${description}">
-                <meta property="og:image" content="">
+                <meta property="og:image" content="https://app.culturafreak.com/app-icon.svg">
                 <meta property="og:image:width" content="1200">
-                <meta property="og:image:height" content="630">
-                <meta property="og:image:type" content="image/jpeg">
+                <meta property="og:image:height" content="1200">
+                <meta property="og:image:type" content="image/svg+xml">
                 
                 <!-- Twitter Card -->
                 <meta name="twitter:card" content="summary_large_image">
                 <meta name="twitter:title" content="${titulo}">
                 <meta name="twitter:description" content="${description}">
-                <meta name="twitter:image" content="">
+                <meta name="twitter:image" content="https://app.culturafreak.com/app-icon.svg">
             `);
         })();
     </script>
@@ -175,68 +175,43 @@
             }
         }
         
-        // Función para actualizar meta tags dinámicamente (simplificada)
-        function updateMetaTags(eventoId) {
-            // Los meta tags ya se generan dinámicamente en el head
-            // Solo necesitamos actualizar el título de la página si es necesario
-            const urlParams = new URLSearchParams(window.location.search);
-            const titulo = urlParams.get('titulo') || `Evento ${eventoId}`;
-            
-            // El título ya está configurado, pero podemos verificar
-            if (!document.title.includes(titulo)) {
-                document.title = `${titulo} - CULTURAFREAK`;
-            }
-        }
-        
-        // Función para obtener emoji por categoría (igual que en iOS)
-        function getEmojiForCategory(categoria) {
-            switch (categoria.toUpperCase()) {
-                case 'CINEYTV':
-                    return '🎬';
-                case 'VIDEOJUEGOS':
-                    return '🎮';
-                case 'DEPORTES':
-                    return '⚽';
-                case 'TECNOLOGIA':
-                    return '💻';
-                case 'FESTIVIDADES':
-                    return '🎉';
-                case 'CURIOSIDADES':
-                    return '🤔';
-                default:
-                    return '🎟️';
-            }
-        }
-        
-        // Función principal de redirección
+        // Función principal de redirección - simplificada
         function handleRedirect() {
             const device = detectDevice();
             const downloadLink = document.getElementById('download-link');
-            
-            // Actualizar meta tags
-            updateMetaTags(eventoId);
             
             // Mostrar interfaz
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app-link').style.display = 'block';
             
             if (device === 'ios') {
-                // Intentar abrir la app primero, luego App Store
+                // Para iOS: primero intentar Universal Link, luego App Store
                 downloadLink.href = appStoreUrl;
                 downloadLink.textContent = '📱 Abrir en CULTURAFREAK';
                 
-                // Intentar abrir la app directamente
+                // Intentar abrir la app directamente con URL scheme
                 setTimeout(() => {
-                    window.location.href = appCustomUrl;
-                }, 100);
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = appCustomUrl;
+                    document.body.appendChild(iframe);
+                    
+                    // Limpiar el iframe después de intentar
+                    setTimeout(() => {
+                        document.body.removeChild(iframe);
+                    }, 100);
+                }, 500);
                 
-                // Si no se abre la app, redirigir a App Store después de 2 segundos
+                // Timeout para mostrar App Store si la app no se abre
                 setTimeout(() => {
-                    window.location.href = appStoreUrl;
-                }, 2000);
+                    // Solo redirigir si el usuario sigue en la página
+                    if (document.visibilityState === 'visible') {
+                        window.location.href = appStoreUrl;
+                    }
+                }, 3000);
                 
             } else {
-                // Para Android u otros, mostrar App Store
+                // Para otros dispositivos
                 downloadLink.href = appStoreUrl;
                 downloadLink.textContent = '📱 Descargar CULTURAFREAK';
                 

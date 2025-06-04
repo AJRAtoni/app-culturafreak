@@ -6,7 +6,11 @@
                 "components": [
                     {
                         "/": "/evento/*",
-                        "comment": "Matches evento paths"
+                        "comment": "Matches evento paths with IDs"
+                    },
+                    {
+                        "/": "/evento/",
+                        "comment": "Matches base evento path"
                     }
                 ]
             }

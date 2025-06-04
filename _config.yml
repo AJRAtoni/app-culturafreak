@@ -1,0 +1,15 @@
+# Configuración para GitHub Pages
+include:
+  - .well-known
+
+# Asegurar que el archivo apple-app-site-association se sirva como JSON
+defaults:
+  - scope:
+      path: ".well-known/apple-app-site-association"
+    values:
+      content-type: "application/json"
+
+# Configuración básica
+title: CulturaFreak
+description: Tu agenda cultural personal
+url: "https://app.culturafreak.com" 
