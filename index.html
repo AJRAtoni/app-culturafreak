@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CulturaFreak - Tu agenda cultural</title>
+    
+    <!-- Meta tags básicos -->
+    <meta name="description" content="Descubre y organiza los mejores eventos culturales con CulturaFreak">
+    <meta name="author" content="CulturaFreak">
+    
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:title" content="CulturaFreak - Tu agenda cultural">
+    <meta property="og:description" content="Descubre y organiza los mejores eventos culturales">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://app.culturafreak.com">
+    <meta property="og:image" content="https://app.culturafreak.com/app-icon.png">
+    
+    <!-- Apple App Store -->
+    <meta name="apple-itunes-app" content="app-id=TU_APP_ID">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 20px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            background: #667eea;
+            border-radius: 16px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+        
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .evento-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .evento-titulo {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .evento-detalles {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .download-button {
+            background: #007AFF;
+            color: white;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            display: inline-block;
+            transition: background 0.2s;
+            margin-bottom: 20px;
+        }
+        
+        .download-button:hover {
+            background: #0056CC;
+        }
+        
+        .app-store-badge {
+            max-width: 150px;
+            margin: 20px auto 0;
+            opacity: 0.8;
+        }
+        
+        .footer {
+            color: #999;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                margin: 10px;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-icon">🎟️</div>
+        <h1>CulturaFreak</h1>
+        <p class="subtitle">Tu agenda cultural personal</p>
+        
+        <!-- Información del evento (se muestra dinámicamente) -->
+        <div id="evento-info" class="evento-info" style="display: none;">
+            <div class="evento-titulo" id="evento-titulo"></div>
+            <div class="evento-detalles" id="evento-detalles"></div>
+        </div>
+        
+        <div id="mensaje-general">
+            <p class="subtitle">Descubre y organiza los mejores eventos culturales de tu ciudad</p>
+        </div>
+        
+        <a href="#" id="download-link" class="download-button">
+            Descargar App
+        </a>
+        
+        <div class="footer">
+            <p>Disponible para iPhone y iPad</p>
+        </div>
+    </div>
+
+    <script>
+        // Detectar si estamos en una URL de evento
+        const path = window.location.pathname;
+        const eventoMatch = path.match(/^\/evento\/(.+)$/);
+        
+        if (eventoMatch) {
+            const eventoId = eventoMatch[1];
+            
+            // Mostrar información del evento
+            document.getElementById('evento-info').style.display = 'block';
+            document.getElementById('mensaje-general').style.display = 'none';
+            
+            // Título por defecto
+            document.getElementById('evento-titulo').textContent = '🎟️ Evento Cultural';
+            document.getElementById('evento-detalles').textContent = '📅 Descubre todos los detalles en la app';
+            
+            // Intentar obtener información de los parámetros URL si los hay
+            const urlParams = new URLSearchParams(window.location.search);
+            const titulo = urlParams.get('titulo');
+            const fecha = urlParams.get('fecha');
+            const categoria = urlParams.get('categoria');
+            
+            if (titulo) {
+                document.getElementById('evento-titulo').textContent = `🎟️ ${decodeURIComponent(titulo)}`;
+                
+                let detalles = '';
+                if (fecha) {
+                    detalles += `📅 ${decodeURIComponent(fecha)}`;
+                }
+                if (categoria) {
+                    if (detalles) detalles += ' • ';
+                    detalles += decodeURIComponent(categoria);
+                }
+                
+                if (detalles) {
+                    document.getElementById('evento-detalles').textContent = detalles;
+                }
+            }
+            
+            // Actualizar meta tags dinámicamente
+            if (titulo) {
+                document.title = `${decodeURIComponent(titulo)} - CulturaFreak`;
+                
+                // Actualizar Open Graph
+                const ogTitle = document.querySelector('meta[property="og:title"]');
+                if (ogTitle) {
+                    ogTitle.setAttribute('content', `${decodeURIComponent(titulo)} - CulturaFreak`);
+                }
+                
+                const ogDesc = document.querySelector('meta[property="og:description"]');
+                if (ogDesc && fecha) {
+                    ogDesc.setAttribute('content', `📅 ${decodeURIComponent(fecha)} - Descubre este evento en CulturaFreak`);
+                }
+            }
+        }
+        
+        // Configurar enlace de descarga
+        const downloadButton = document.getElementById('download-link');
+        
+        // Detectar plataforma
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        
+        if (isIOS) {
+            // Intentar abrir en App Store (reemplaza con tu App ID real)
+            downloadButton.href = 'https://apps.apple.com/us/app/culturafreak/id6744939463';
+            downloadButton.textContent = 'Abrir en App Store';
+        } else if (isAndroid) {
+            // Para futura versión Android
+            downloadButton.href = '#';
+            downloadButton.textContent = 'Comprate un iPhone';
+            downloadButton.style.background = '#ccc';
+        } else {
+            // Desktop
+            downloadButton.href = 'https://apps.apple.com/us/app/culturafreak/id6744939463';
+            downloadButton.textContent = 'Ver en App Store';
+        }
+        
+        // Auto-redirección después de unos segundos (opcional)
+        if (eventoMatch && isIOS) {
+            setTimeout(() => {
+                // Intentar abrir la app una vez más por si acaso
+                window.location.href = `culturafreak://evento/${eventoMatch[1]}`;
+            }, 1000);
+        }
+    </script>
+</body>
+</html> 
