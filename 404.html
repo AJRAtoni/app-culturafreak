@@ -9,13 +9,9 @@
         (function() {
             const path = window.location.pathname;
             
-            // Si es una ruta de evento, manejar la redirección
+            // Si es una ruta de evento, NO redirigir - manejar aquí directamente
             if (path.startsWith('/evento/')) {
-                const eventoId = path.split('/evento/')[1];
-                
-                // Redirigir a la página de evento con el ID preservado
-                const search = window.location.search;
-                window.location.href = `/evento/${search ? `?eventoId=${eventoId}&${search.substring(1)}` : `?eventoId=${eventoId}`}`;
+                // No hacer nada, dejar que la página maneje el evento
                 return;
             }
             
@@ -196,7 +192,7 @@
             }
         }
         
-        // Función principal de redirección
+        // Función principal de redirección - OPTIMIZADA para ser más directa
         function handleRedirect() {
             const device = detectDevice();
             const downloadLink = document.getElementById('download-link');
@@ -206,41 +202,52 @@
             document.getElementById('app-link').style.display = 'block';
             
             if (device === 'ios') {
-                // Para iOS: intentar Universal Link y URL scheme
                 downloadLink.href = appStoreUrl;
                 downloadLink.textContent = '📱 Abrir en CULTURAFREAK';
                 
-                // Intentar abrir la app directamente
-                setTimeout(() => {
-                    // Crear iframe oculto para intentar abrir la app
-                    const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
-                    iframe.src = appCustomUrl;
-                    document.body.appendChild(iframe);
-                    
-                    // Limpiar el iframe
-                    setTimeout(() => {
-                        if (document.body.contains(iframe)) {
-                            document.body.removeChild(iframe);
-                        }
-                    }, 500);
-                }, 1000);
+                // Método directo: intentar Universal Link y si falla, ir inmediatamente al App Store
+                let redirected = false;
                 
-                // Timeout para App Store si la app no se abre
+                // Detectar cuando el usuario deja la página (app se abrió exitosamente)
+                const preventAppStore = () => {
+                    redirected = true;
+                };
+                
+                document.addEventListener('visibilitychange', preventAppStore);
+                window.addEventListener('blur', preventAppStore);
+                window.addEventListener('pagehide', preventAppStore);
+                
+                // Intentar abrir la app inmediatamente
+                try {
+                    window.location.href = appCustomUrl;
+                } catch (e) {
+                    // Si hay error, ir al App Store inmediatamente
+                    window.location.href = appStoreUrl;
+                    return;
+                }
+                
+                // Si después de 800ms sigue aquí, la app no está instalada
                 setTimeout(() => {
-                    if (document.visibilityState === 'visible') {
+                    if (!redirected && !document.hidden) {
+                        // Limpiar listeners
+                        document.removeEventListener('visibilitychange', preventAppStore);
+                        window.removeEventListener('blur', preventAppStore);
+                        window.removeEventListener('pagehide', preventAppStore);
+                        
+                        // Ir directamente al App Store
                         window.location.href = appStoreUrl;
                     }
-                }, 4000);
+                }, 800);
                 
             } else {
-                // Para otros dispositivos
+                // Para otros dispositivos: App Store directo
                 downloadLink.href = appStoreUrl;
                 downloadLink.textContent = '📱 Descargar CULTURAFREAK';
                 
+                // Ir inmediatamente al App Store en otros dispositivos
                 setTimeout(() => {
                     window.location.href = appStoreUrl;
-                }, 3000);
+                }, 500);
             }
         }
         
